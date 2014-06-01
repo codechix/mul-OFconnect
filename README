@@ -1,0 +1,82 @@
+ How to build MUL Controller on Ubuntu ?
+
+1. Get necessary packages 
+
+    a) For Ubuntu 10.04.3 LTS, the following packages should be installed :
+   
+       > sudo apt-get install flex bison libwxgtk2.6-dev build-essential 
+         expect g++-multilib tofrodos zlib1g-dev gawk libffi-dev
+
+       Not verified with recent ubuntu versions but should work fine.
+
+    b) Install core packages glib-2.0 (>= 2.32) and libevent (>= 2.0.18):
+
+       i) There is a utility script which should configure and build these 
+          packages(but will not install), just, do enough for mul compilation :
+
+        >  cd  SCRIPTS
+        >  ./configure_ext_libs 
+
+        OR, 
+
+       ii) One can also download and build/install them separately or by apt-get. 
+
+    c) [Optional for performance] Install google's tcmalloc  
+
+       > sudo apt-get install libtcmalloc-minimal0
+    
+       Before running MuL,  execute the following :
+ 
+       > export LD_PRELOAD=/usr/lib/libtcmalloc_minimal.so.0
+
+2. Configure MuL 
+
+    a) If you used built-in script to download core packages, then one can 
+       use the following:
+
+       > ./configure  --with-glib=`pwd`/common-libs/3rd-party/glib-2.32.0/ 
+         --with-libevent=`pwd`/common-libs/3rd-party/libevent-2.0.21-stable/ 
+        
+    b) If you build and install glib and libevent separately, we can simply use:
+       > ./configure    ## Pass LDFLAGS and CFLAGS if these are installed in non-
+                        ## standard directories.
+
+    c) configure script options :
+
+       > --with-l2sw=y  ## Build l2sw module as a separate process (default)
+
+       OR, 
+        
+       > --with-l2sw=m  ## Build l2sw module as a modular entity inside the 
+                        ## controller. (performance mode)
+3. Build MuL 
+
+   > make 
+
+4. Executable will be built as <top-mul-dir>/mul/mul
+
+   - You need to run using sudo or as admin.
+
+    Options to use -
+    mul -d      : Daemon mode
+        -S <n>  : Num of switch threads
+        -A <n>  : Num of app threads
+
+5. [Optional if you opt for modules to run as a separate process]
+
+    > cd application/l2switch/
+
+    Executable :  mull2sw
+
+    Same thing applies to other apps 
+
+6. How to run ?
+    
+    Mul provides an utility startup script for various use cases :  
+     
+    > cd <top-mul-dir>
+    > ./mul.sh start l2switch   ## Run in l2switch mode
+    
+    OR,
+
+    > ./mul.sh start fabric     ## Run in fabric 
